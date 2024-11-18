@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base{
+  html{
+    @apply bg-stone-950 text-white;
+  }
+
+  body{
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer components{
+  .player.rhap_container{
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  .player .rhap_time{
+    color: #DD4F4F;
+  }
+
+  .player .rhap_progress-filled, .player .rhap_progress-indicator{
+    background: #DD4F4F;
+  }
+
+  .player .rhap_progress-bar{
+    background: rgba(255,255,255,0.2);
+  }
+}
