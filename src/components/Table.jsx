@@ -1,66 +1,93 @@
 import React from 'react';
 import { useGlobalContext } from '../hooks/useGlobalContext';
+import { DecimalToPercentage } from '../utils/helper';
 
 const Table = () => {
   const { results } = useGlobalContext();
 
-  const DecimalToPercentage = (decimal) => {
-    const percentage = (decimal * 100).toFixed(2) + '%';
-    return percentage;
+  const category = {
+    "Normal": ['normal', 'extrahls'],
+    "Abnormal": [ 'abnormal', 'murmur', 'extrastole']
   };
-
-  // Pastel colors for each EXP column
-  const columnColors = [
-    'bg-pink-200',  // EXP1 (Light Pink)
-    'bg-blue-200',  // EXP2 (Light Blue)
-    'bg-green-200', // EXP3 (Light Green)
-    'bg-yellow-200', // EXP4 (Light Yellow)
-    'bg-purple-200', // EXP5 (Light Purple)
-  ];
+  function classifyResult(result) {
+    for (let [categoryName, conditions] of Object.entries(category)) {
+      if (conditions.includes(result)) {
+        return categoryName;
+      }
+    }
+    return "No Heart Sound";  
+  }
 
   return (
-    <div className="overflow-x-auto bg-stone-900 p-8 rounded-md">
-      <h2 className='text-2xl font-semibold mb-4'>Model Prediction</h2>
-      <table className="table-auto w-full text-sm text-left text-stone-800 border-collapse border border-stone-700">
-        <thead className="bg-stone-900 text-xs uppercase text-stone-400">
-          <tr>
-            <th className="px-4 py-3 border border-stone-700">Metric</th>
-            {['1', '2', '3', '4', '5'].map((exp, index) => (
-              <th
-                key={index}
-                className={`px-4 py-3 border border-stone-700 ${columnColors[index]} text-stone-800 font-semibold`}
-              >
-                Experiment #{exp}
+    <>
+      <div className='mb-4'>
+        <h2 className="text-xl font-medium mb-2 text-white">Model Prediction</h2>
+        <p className='text-[#d3d3d3]'>The table showcases the outcomes of evaluating the input data using five different models. This provides a comparative view of the models' performance in processing and interpreting the input data.</p>
+      </div>
+      <div className="rounded-lg border border-[#383838] overflow-hidden mb-2">
+        <table className="table-auto w-full border-separate text-sm rounded-lg" style={{ borderSpacing: '0' }}>
+          <thead className="bg-[#383838] text-gray-300">
+            <tr>
+              <th className="border border-[#565656] px-4 py-2 text-left first:rounded-tl-lg last:rounded-tr-lg">
+                Models
               </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          <tr className="bg-stone-900 hover:bg-stone-800">
-            <td className="px-4 py-3 border border-stone-700 font-bold text-stone-200">Classification</td>
-            {results.models.map((model, index) => (
-              <td
-                key={index}
-                className={`px-4 py-3 border border-stone-700 ${columnColors[index]} font-medium text-stone-800`}
-              >
-                {model.classification}
+              {["Spectrogram + CNN (Binary)", "Spectrogram + CNN (Categorical)", "Spectrogram + CNN-LSTM (Categorical)", "MFCC + CNN (Categorical)", "MFCC + CNN-LSTM (Categorical)"].map((exp, index) => (
+                <th
+                  key={index}
+                  className="border border-[#565656] px-4 py-2 font-semibold text-xs"
+                >
+                   {exp}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {/* Classification Row */}
+            <tr className="text-white ">
+              <td className="bg-[#383838] border border-[#565656] px-4 py-2 font-bold">
+                Classification
               </td>
-            ))}
-          </tr>
-          <tr className="bg-stone-800 hover:bg-stone-700">
-            <td className="px-4 py-3 border border-stone-700 font-bold text-stone-200">Prediction Score</td>
-            {results.models.map((model, index) => (
-              <td
-                key={index}
-                className={`px-4 py-3 border border-stone-700 ${columnColors[index]} font-medium text-stone-800`}
-              >
-                {DecimalToPercentage(model.prediction_score)}
+              {results.models.map((model, index) => (
+                <td
+                  key={index}
+                  className="border border-[#383838] px-4 py-2 font-medium"
+                >
+                  {model.classification}
+                </td>
+              ))}
+            </tr>
+            {/* Prediction Score Row */}
+            <tr className="text-white">
+              <td className="bg-[#383838] border border-[#565656] px-4 py-2 font-bold">
+                Prediction Score
               </td>
-            ))}
-          </tr>
-        </tbody>
-      </table>
-    </div>
+              {results.models.map((model, index) => (
+                <td
+                  key={index}
+                  className={`border border-[#383838] px-4 py-2 font-medium ${model.prediction_score >= 0.5 ? 'text-green-300' : 'text-red-300'}`}
+                >
+                  {DecimalToPercentage(model.prediction_score)}
+                </td>
+              ))}
+            </tr>
+            {/* Final Prediction Row */}
+            <tr className="text-white">
+              <td className="bg-[#383838] border border-[#565656] px-4 py-2 font-bold">
+                Final Prediction
+              </td>
+              {results.models.map((model, index) => (
+                <td
+                  key={index}
+                  className={`border border-[#383838] px-4 py-2 font-medium}`}
+                >
+                  {classifyResult(model.classification)}
+                </td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 };
 

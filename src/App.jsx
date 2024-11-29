@@ -4,16 +4,14 @@ import Home from './pages/Home'
 import Summary from './pages/Summary'
 import { useGlobalContext } from './hooks/useGlobalContext'
 import ProtectedLayout from './layout/ProtectedLayout'
+import Predict from './pages/Predict'
 
 
 const App = () => {
   const {results} = useGlobalContext();
   const router = createBrowserRouter(createRoutesFromElements(
     <Route>
-      <Route path='/' index element={<Home/>}/>
-      <Route element={<ProtectedLayout/>}>
-        <Route path='/summary' element={<Summary/>}/>
-      </Route>
+      <Route path='/' index element={<Predict/>}/>
     </Route>
   ))
 
